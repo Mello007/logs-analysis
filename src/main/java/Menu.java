@@ -1,75 +1,143 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
- * Created by artem on 14.11.16.
+ * Show console menu to user. There are five menu items: four for sorting and one for the exit.
  */
-public class Menu {
 
+class Menu {
+
+    /**
+     * Scanner for adoption of the values in the console
+     */
     private Scanner select = new Scanner(System.in);
-    private Record recordCriteria = new Record();
 
-    void menu(){
-        System.out.println("1. Найти записи по имени пользователя\n" +
-                            "2. Найти записи по временному периоду\n" +
-                            "3. Найти записи по шаблону сообщения\n" +
-                "4. Поиск записей по нескольким критериям");
-        Integer selection = select.nextInt();
-        do {
+    /**
+     * Class object RecordTemplate
+     */
+    private RecordTemplate recordCriteria = new RecordTemplate();
+
+    /*
+     * Class object Logs to call method findAndWriteResults
+     */
+    private Logs logs = new Logs();
+    /*
+     * A special date format ("dd-MM-yyyy") for recording and reading
+     */
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+    /**
+     * Method which show Menu to User.
+     * User must select one of the items and follow the instructions
+     * @throws InputMismatchException print message
+     */
+    Menu(){
+        System.out.println("1. Find the record by the name of the user.\n" +
+                            "2. Find the records by the period of time.\n" +
+                            "3. Find records by the message template.\n" +
+                "4. Search of the records by several criteria.\n" +
+                "5. Exit\n");
+        String selection = select.nextLine();
+        try {
             switch (selection) {
-                case 1:
+                case "1":
                     findRecordsFromName();
                     break;
-                case 2:
+                case "2":
                     findRecordsFromTime();
                     break;
-                case 3:
+                case "3":
                     findRecordFromTemplate();
                     break;
-                case 4:
+                case "4":
                     findRecordsFromSomeCriterias();
                     break;
-                case 5:
+                case "5":
                     System.exit(0);
                 default:
-                    System.out.println("Вы сделали неправильный выбор! Попробуйте еще раз!");
+                    System.out.println("You made the wrong choice! Try again!");
             }
-        } while (selection != 5);
+        } catch (InputMismatchException e){
+            System.out.println("You need to write numbers!");
+        }
     }
 
+    /**
+     * A method that requires a username and seeks records on this parameter
+     */
     private void findRecordsFromName(){
-        System.out.println("Введите имя пользователя\n");
-        String userName = select.next();
+        //Entry user name
+        System.out.println("Enter the user Name\n");
+        recordCriteria.setUserName(select.nextLine());
+
+        //start method for adding path and otput file name
+        addPathsAndFindLogs();
     }
 
+    /**
+     * method that requests the initial date and end date and seeks records in this parameter
+     * @throws DateTimeParseException print message
+     */
     private void findRecordsFromTime(){
+        try {
+            //Entry initial date in format d-MM-yyyy
+            System.out.println("Enter the initial date in the format of range d-MM-yyyy\n");
+            recordCriteria.setDate(LocalDate.parse(select.nextLine(), formatter));
+            //Entry initial date in format d-MM-yyyy
+            System.out.println("Enter the final date in the format of range d-MM-yyyy");
 
-        System.out.println("Введите время\n");
-        String time = select.next();
+            recordCriteria.setSecondDate(LocalDate.parse(select.nextLine(), formatter));
+            addPathsAndFindLogs();
+        } catch (DateTimeParseException e){
+            System.out.println("You've written the incorrect date!");
+        }
     }
 
+    /**
+     * A method that requires the template message and seeks records on this parameter
+     */
     private void findRecordFromTemplate(){
-        System.out.println("Введите текст сообщения для шаблона\n");
-        String textOfMessage = select.next();
+
+        //Entry template message to sort
+
+        System.out.println("Enter template message\n");
+        recordCriteria.setRecordBody(select.nextLine());
+        addPathsAndFindLogs();
     }
 
-    private String isPassedCriteria(String select){
-        String criteria;
-        if (select.equals("*")){
-            criteria = select;
-        } else criteria = null;
-        return criteria;
+    /**
+     *  This is default method that requires the path for input and output files and seeks records on this parameter
+     */
+    private void addPathsAndFindLogs(){
+
+        String pathInputFiles;
+        String pathOutputFiles;
+        String fileName;
+
+        //Entry path to input and output files.
+
+        System.out.println("Enter path to input files");
+        pathInputFiles = select.nextLine();
+        System.out.println("Enter path to output files");
+        pathOutputFiles = select.nextLine();
+
+        // Entry file name
+        System.out.println("Enter file name for output files");
+        fileName = select.nextLine();
+
+        //start method findAndWriteResults
+        logs.findAndWriteResults(pathInputFiles, pathOutputFiles, fileName, recordCriteria);
     }
 
+    /**
+     * A method that requires a username and invoke method findRecordsFromTime
+     */
     private void findRecordsFromSomeCriterias(){
-
-        System.out.println("Введите имя пользователя или '*' чтобы пропустить этот пункт");
-        recordCriteria.setUserName(isPassedCriteria(select.next()));
-
-        System.out.println("Введите дату или '*' чтобы пропустить этот пункт");
-        recordCriteria.setDate(isPassedCriteria(select.next()));
-
-        System.out.println("Введите шаблон сообщения или '*' чтобы пропустить этот пункт");
-        recordCriteria.setRecordBody(isPassedCriteria(select.next()));
+        System.out.println("Enter the user name");
+        recordCriteria.setUserName(select.nextLine());
+        findRecordsFromTime();
     }
-
 }

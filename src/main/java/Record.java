@@ -1,32 +1,38 @@
+import java.time.LocalDate;
 
+/**
+ * @author Artem
+ *  Record contains userName, date and recordBody.
+ *  Also there are getters and setters
+ */
 
 class Record {
 
     private String userName;
-    private String date;
+    private LocalDate date;
     private String recordBody;
 
-    public String getUserName() {
+    String getUserName() {
         return userName;
     }
 
-    public void setUserName(String userName) {
+    void setUserName(String userName) {
         this.userName = userName;
     }
 
-    public String getDate() {
+    LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    void setDate(LocalDate date) {
         this.date = date;
     }
 
-    public String getRecordBody() {
+    String getRecordBody() {
         return recordBody;
     }
 
-    public void setRecordBody(String recordBody) {
+    void setRecordBody(String recordBody) {
         this.recordBody = recordBody;
     }
 }
