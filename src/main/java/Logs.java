@@ -1,8 +1,10 @@
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -88,8 +90,10 @@ class Logs {
             record.setDate(localDate);
             record.setUserName(components.get(USER_NAME_IN_LINE).replace(" ", ""));
             record.setRecordBody(components.get(RECORD_BODY_IN_LINE));
-        } catch (ArrayIndexOutOfBoundsException e){
+        } catch (ArrayIndexOutOfBoundsException ex){
             System.out.println("txt file is wrong!\n");
+        } catch (DateTimeParseException ex){
+            System.out.println("date is wrong in line!");
         }
         return record;
     }
@@ -180,7 +184,7 @@ class Logs {
     private void write(String path, List<Record> records, String filename) {
         //Check empty file or not
         if (!records.isEmpty()) {
-            File file = new File(path + filename);
+            File file = new File(path + filename + ".txt");
             try {
                 //If the file does not exist then create it
                 if (!file.exists()) {
